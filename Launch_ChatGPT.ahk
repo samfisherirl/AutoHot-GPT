@@ -1,21 +1,20 @@
 ﻿#Requires Autohotkey v2.0
 #SingleInstance Force
-#Include chatgpt_ahk_generator\convert\ConvertFuncs.ahk
-#Include chatgpt_ahk_generator\convert\_menu_handler_mod.ahk
+#Include convert\ConvertFuncs.ahk
+#Include convert\_menu_handler_mod.ahk
 ;AutoGUI 2.5.8
 ;Auto-GUI-v2 credit to autohotkey.com/boards/viewtopic.php?f=64&t=89901
 ;AHKv2converter credit to github.com/mmikeww/AHK-v2-script-converter
-exe := "`"" A_ScriptDir "\chatgpt_ahk_generator\AutoHotKey Exe\AutoHotkeyV1.exe`" " 
-exe2 := "`"" A_ScriptDir "\chatgpt_ahk_generator\AutoHotKey Exe\AutoHotkeyV2.exe`" "     ; specify the path to the AutoHotkey V1 executable
-autogui := "`"" A_ScriptDir "\chatgpt_ahk_generator\AutoGUI.ahk`""   ; specify the path to the AutoGUI script
-logs := A_ScriptDir "\chatgpt_ahk_generator\log.txt"    ; set the path to the log file
-app := A_ScriptDir "\chatgpt_ahk_generator\AutoHot-ChatGPT.exe"    ; set the path to the log file
-
-empty := A_ScriptDir "\chatgpt_ahk_generator\empty.txt"    ; set the path to an empty file
-temps := A_ScriptDir "\chatgpt_ahk_generator\temp.txt"    ; set the path to a temporary file
-ret := A_ScriptDir "\chatgpt_ahk_generator\return.txt"    ; set the path to the return status file
-sets := A_ScriptDir "\chatgpt_ahk_generator\AutoGUI.ini"
-runscript := A_ScriptDir "\chatgpt_ahk_generator\runscript.ahk"
+exe := "`"" A_ScriptDir "\convert\AutoHotKey Exe\AutoHotkeyV1.exe`" "
+exe2 := "`"" A_ScriptDir "\convert\AutoHotKey Exe\AutoHotkeyV2.exe`" "     ; specify the path to the AutoHotkey V1 executable
+autogui := "`"" A_ScriptDir "\convert\AutoGUI.ahk`""   ; specify the path to the AutoGUI script
+app := "C:\Users\dower\Desktop\ChatGPT-GUI-main\ChatGPT-GUI.py"    ; set the path to the log file
+logs := A_ScriptDir "\v1.ahk"    ; set the path to the log file
+empty := A_ScriptDir "\convert\empty.txt"    ; set the path to an empty file
+temps := A_ScriptDir "\convert\temp.txt"    ; set the path to a temporary file
+ret := A_ScriptDir "\v2.ahk"    ; set the path to the return status file
+sets := A_ScriptDir "\convert\AutoGUI.ini"
+runscript := A_ScriptDir "\convert\runscript.ahk"
 
 if FileExist(logs) {
     FileDelete(logs)
@@ -26,12 +25,12 @@ if FileExist(temps) {
 if FileExist(ret) {
     FileDelete(ret)
 }
-
-Run(app, A_ScriptDir "\chatgpt_ahk_generator", , &PID)     ; run the concatenated command, which launches AutoGUI
-Sleep(1000)    ; wait for 1 second
-findProcess(PID)
-
-While ProcessExist(PID)    ; while the AutoGUI process exists
+;Run(app, A_ScriptDir "\chatGPT", , &PID)     ; run the concatenated command, which launches AutoGUI
+;Sleep(1000)    ; wait for 1 second
+;findProcess(PID)
+msgbox("please run the app from venv")
+x := 1
+While (x==1)    ; while the AutoGUI process exists
     ; wait for %logs% to exist, that means AutoGui is trying to generate code.
     ; this loop will convert to v2 and notify AutoGUI via %retstat%
     ; wait for %logs% to exist, that means AutoGui is trying to generate code.
@@ -40,12 +39,12 @@ While ProcessExist(PID)    ; while the AutoGUI process exists
     if FileExist(logs)    ; check if the log file exists
     {
         inscript := tryRead(logs)    ; read the contents of the log file into a variable
-        if (inscript != "")    ; if the variable is not empty       
-            {
-                FileMove(logs, "temps.txt", 1)    ; move the log file to the temporary file
-                    Converter(inscript)
-                    sleep(10)
-                } }
+        if (inscript != "")    ; if the variable is not empty
+        {
+            tryMove(logs)   ; move the log file to the temporary file
+            Converter(inscript)
+            sleep(10)
+        } }
     else {
         Sleep(10)
         continue
@@ -62,11 +61,22 @@ Converter(inscript) {
     outfile.Write(script)    ; write the final code to the file
     outfile.Close()    ; close the file
     FileCopy(temps, ret, 1)    ; append the return status to the return status file
-    FileCopy(temps, A_ScriptDir "\code.ahk", 1)    ; append the return status to the return status file
     A_Clipboard := ""
     A_Clipboard := script
 }
 
+tryMove(l) {
+    loop 10 {
+        try {
+            FileMove(l, temps, 1)
+            break
+        }
+        catch {
+            sleep(5)
+        }
+        
+    }
+}
 setDesignMode(ini) {
     replaceSettings := ""
     x := 0
@@ -96,7 +106,8 @@ findProcess(PID) {
 ;try {out := FileRead(path)}
 tryRead(path) {
     try {
-        out := FileRead(path)
+        FileCopy(path, temps, 1)
+        out := FileRead(temps)
         return out
     }
     catch {
