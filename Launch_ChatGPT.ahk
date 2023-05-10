@@ -1,20 +1,20 @@
 ﻿#Requires Autohotkey v2.0
 #SingleInstance Force
-#Include convert\ConvertFuncs.ahk
-#Include convert\_menu_handler_mod.ahk
+#Include AutoHotGPT.exe\convert\ConvertFuncs.ahk
+#Include AutoHotGPT.exe\convert\_menu_handler_mod.ahk
 ;AutoGUI 2.5.8
 ;Auto-GUI-v2 credit to autohotkey.com/boards/viewtopic.php?f=64&t=89901
 ;AHKv2converter credit to github.com/mmikeww/AHK-v2-script-converter
-exe := "`"" A_ScriptDir "\convert\AutoHotKey Exe\AutoHotkeyV1.exe`" "
-exe2 := "`"" A_ScriptDir "\convert\AutoHotKey Exe\AutoHotkeyV2.exe`" "     ; specify the path to the AutoHotkey V1 executable
-autogui := "`"" A_ScriptDir "\convert\AutoGUI.ahk`""   ; specify the path to the AutoGUI script
+exe := "`"" A_ScriptDir "\AutoHotGPT.exe\AutoHotGPT.exe\convert\AutoHotKey Exe\AutoHotkeyV1.exe`" "
+exe2 := "`"" A_ScriptDir "\AutoHotGPT.exe\convert\AutoHotKey Exe\AutoHotkeyV2.exe`" "     ; specify the path to the AutoHotkey V1 executable
+autogui := "`"" A_ScriptDir "\AutoHotGPT.exe\convert\AutoGUI.ahk`""   ; specify the path to the AutoGUI script
 app := "C:\Users\dower\Desktop\ChatGPT-GUI-main\ChatGPT-GUI.py"    ; set the path to the log file
-logs := A_ScriptDir "\v1.ahk"    ; set the path to the log file
-empty := A_ScriptDir "\convert\empty.txt"    ; set the path to an empty file
-temps := A_ScriptDir "\convert\temp.txt"    ; set the path to a temporary file
-ret := A_ScriptDir "\v2.ahk"    ; set the path to the return status file
-sets := A_ScriptDir "\convert\AutoGUI.ini"
-runscript := A_ScriptDir "\convert\runscript.ahk"
+logs := A_ScriptDir "\AutoHotGPT.exe\v1.ahk"    ; set the path to the log file
+empty := A_ScriptDir "\AutoHotGPT.exe\convert\empty.txt"    ; set the path to an empty file
+temps := A_ScriptDir "\AutoHotGPT.exe\convert\temp.txt"    ; set the path to a temporary file
+ret := A_ScriptDir "\AutoHotGPT.exe\v2.ahk"    ; set the path to the return status file
+sets := A_ScriptDir "\AutoHotGPT.exe\convert\AutoGUI.ini"
+runscript := A_ScriptDir "\AutoHotGPT.exe\convert\runscript.ahk"
 
 if FileExist(logs) {
     FileDelete(logs)
@@ -25,10 +25,10 @@ if FileExist(temps) {
 if FileExist(ret) {
     FileDelete(ret)
 }
-;Run(app, A_ScriptDir "\chatGPT", , &PID)     ; run the concatenated command, which launches AutoGUI
+;Run(app, A_ScriptDir "\AutoHotGPT.exe\chatGPT", , &PID)     ; run the concatenated command, which launches AutoGUI
 ;Sleep(1000)    ; wait for 1 second
 ;findProcess(PID)
-msgbox("please run the app from venv")
+Run(A_ScriptDir "\AutoHotGPT.exe\AutoHotGPT.exe")
 x := 1
 While (x==1)    ; while the AutoGUI process exists
     ; wait for %logs% to exist, that means AutoGui is trying to generate code.
@@ -60,7 +60,8 @@ Converter(inscript) {
     outfile := FileOpen(temps, "w", "utf-8")    ; open the file for writing
     outfile.Write(script)    ; write the final code to the file
     outfile.Close()    ; close the file
-    FileCopy(temps, ret, 1)    ; append the return status to the return status file
+    FileCopy(temps, ret, 1)  
+    FileCopy(temps, A_ScriptDir "\v2_Script.ahk", 1)    ; append the return status to the return status file
     A_Clipboard := ""
     A_Clipboard := script
 }

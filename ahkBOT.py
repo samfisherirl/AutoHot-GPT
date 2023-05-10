@@ -1,4 +1,4 @@
-import revChatGPT.V3
+from revChatGPT.V3 import Chatbot
 from pathlib import Path
 cwd = Path(__file__).parent
 from shutil import copy, move
@@ -37,12 +37,15 @@ class Chat:
 
     def process_chat(self):
         how_much_code = self.output.count("```")
+        
         if how_much_code == 0:
             print(self.output)
         elif how_much_code > 0:
+            x = how_much_code / 2
             print(self.output)
             ar = self.output.split("```")
-            self.code = ar[1]
+            for i in range(1, len(ar)-1, 2):
+                self.code = self.code + ar[i]
             with open(self.temp, 'w') as f:
                 f.write(self.code)
             copy(self.temp, self.v1)
@@ -51,7 +54,7 @@ class Chat:
                     copy(self.v2, self.temp)
                     with open(self.temp, "r") as f:
                         self.code = f.read()
-                    self.code = "\n\nHere is your AHKv2 code. This is also locate in your clipboard and next to this app:\n" + self.code + "\n"
+                    self.code = "\n\nHere is your AHKv2 code. This is also locate in your clipboard and next to this app:\n\n" + self.code.strip() + "\n"
                     print(self.code)
                     move(self.v2, self.myscript)
                     break
@@ -62,7 +65,7 @@ class Chat:
 def loop_ask():
     chat = Chat()
     key = chat.key
-    chatbot = revChatGPT.V3.Chatbot(api_key=key, engine="gpt-3.5-turbo")
+    chatbot = Chatbot(api_key=key, engine="gpt-3.5-turbo")
     while True:
         chat.ask_user()
         if chat.kill_loop:
